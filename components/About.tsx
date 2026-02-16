@@ -56,7 +56,7 @@ const About: React.FC = () => {
             <div className="bg-white/50 p-6 rounded-2xl border border-stone-100">
                 <h4 className="font-serif text-xl mb-2">Bog'lanish</h4>
                 <div className="flex items-center gap-2 text-amber-600 hover:underline cursor-pointer">
-                    <span className="text-sm">asadbekashurov.uz</span>
+                    <span className="text-sm">ashrv.uz</span>
                     <ExternalLink size={14} />
                 </div>
             </div>
