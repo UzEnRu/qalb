@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(API_KEY || "");
 // Modelni har safar yangi parametrlar bilan olish funksiyasi
 const getModel = (isJson = true) => {
   return genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "gemini-1.5-flash-latest",
     generationConfig: { 
       temperature: 1.0, 
       topP: 0.95,
