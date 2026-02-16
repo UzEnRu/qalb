@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Mail, Github, Instagram, ExternalLink } from 'lucide-react';
+import { Mail, Github, Instagram, ExternalLink, UserRound } from 'lucide-react';
 
 const About: React.FC = () => {
   return (
@@ -24,13 +24,17 @@ const About: React.FC = () => {
             </p>
             
             <div className="flex gap-4">
-              <a href="#" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
+
+              <a href="https://www.ashrv.uz" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
+                <UserRound size={20} />
+              </a>
+              <a href="https://www.instagram.com/thelxn/" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
                 <Instagram size={20} />
               </a>
-              <a href="#" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
+              <a href="https://github.com/UzEnRu" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
                 <Github size={20} />
               </a>
-              <a href="#" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
+              <a href="ashrvuz@gmail.com" className="p-3 bg-stone-100 rounded-full text-stone-600 hover:bg-stone-800 hover:text-white transition-all">
                 <Mail size={20} />
               </a>
             </div>
