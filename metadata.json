@@ -1,0 +1,8 @@
+
+{
+  "name": "Qalb Bog'i - Asadbek Ashurov",
+  "description": "Muhabbat, tinchlik va do'stlik tuyg'ularini mustahkamlash, qalbga orom berish va o'zlikni anglash uchun yaratilgan ma'naviy maskan.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
