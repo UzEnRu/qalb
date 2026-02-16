@@ -1,4 +1,5 @@
 // .tsx kengaytmalarini olib tashlang
+import React, { useState } from 'react'; // "React" so'zi ham bo'lishi shart
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
 import SoulQuotes from './components/SoulQuotes';
