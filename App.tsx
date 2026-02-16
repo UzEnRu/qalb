@@ -1,12 +1,11 @@
-
-import React, { useState } from 'react';
-import Navigation from './components/Navigation.tsx';
-import Hero from './components/Hero.tsx';
-import SoulQuotes from './components/SoulQuotes.tsx';
-import PeaceSpace from './components/PeaceSpace.tsx';
-import About from './components/About.tsx';
-import MiracleModal from './components/MiracleModal.tsx';
-import { AppSection, MiracleType } from './types.ts';
+// .tsx kengaytmalarini olib tashlang
+import Navigation from './components/Navigation';
+import Hero from './components/Hero';
+import SoulQuotes from './components/SoulQuotes';
+import PeaceSpace from './components/PeaceSpace';
+import About from './components/About';
+import MiracleModal from './components/MiracleModal';
+import { AppSection, MiracleType } from './types'; // .ts ham shart emas
 
 const App: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<AppSection>(AppSection.Home);
