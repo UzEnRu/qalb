@@ -1,39 +1,28 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { QuoteResponse, MiracleResponse } from "../types";
 
 // API kalitini olish
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY || "");
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
 
-// Modelni har safar yangi parametrlar bilan olish funksiyasi
-const getModel = (isJson = true) => {
-  return genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash-latest",
-    generationConfig: { 
-      temperature: 1.0, 
-      topP: 0.95,
-      responseMimeType: isJson ? "application/json" : "text/plain",
+export const getSoulQuote = async (category: string) => {
+  // Model nomini models/ prefiksisiz bering, kutubxona o'zi qo'shadi
+  const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    generationConfig: {
+      temperature: 1.0,
+      responseMimeType: "application/json",
     }
   });
-};
 
-// 1. Hikmatli so'zlar uchun
-export const getSoulQuote = async (category: string): Promise<QuoteResponse> => {
-  const model = getModel(true);
-  const randomSeed = Math.random().toString(36).substring(7);
-  
-  const prompt = `Menga ${category} haqida o'ta go'zal, chuqur ma'noli va ilhomlantiruvchi o'zbekcha hikmatli so'z yozib ber. 
-  ID: ${randomSeed}. Javobni FAQAT ushbu JSON formatida ber: { "text": "...", "author": "...", "category": "${category}" }`;
+  const prompt = `Menga ${category} haqida yangi o'zbekcha hikmat yoz. JSON: {"text": "...", "author": "..."}`;
 
   try {
     const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
-  } catch (e) {
-    return {
-      text: "Qalbingizda quyosh porlasin, zero mehr bor joyda zulmatga o'rin yo'q.",
-      author: "Xalq hikmati",
-      category: category as any
-    };
+    const text = result.response.text();
+    return JSON.parse(text);
+  } catch (error: any) {
+    console.error("Batafsil xato:", error);
+    // Agar 404 bo'lsa, demak kalit yoki model nomi hali ham muammo
+    throw error;
   }
 };
 
