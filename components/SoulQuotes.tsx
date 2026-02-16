@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { getSoulQuote } from '../services/geminiService.ts';
+import { getSoulQuote } from '../services/geminiService';
 import { QuoteResponse } from '../types.ts';
 import { RefreshCcw, Quote } from 'lucide-react';
 

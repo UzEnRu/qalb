@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { getMiracleMessage } from '../services/geminiService.ts';
+import { getMiracleMessage } from '../services/geminiService';
 import { MiracleResponse, MiracleType } from '../types.ts';
 import { Sparkles, X } from 'lucide-react';
 
