@@ -14,12 +14,14 @@ const SoulQuotes: React.FC = () => {
     { id: 'do\'stlik', label: 'Do\'stlik' },
   ];
 
-  const fetchQuote = async (cat: string) => {
-    setLoading(true);
-    const result = await getSoulQuote(cat);
-    setQuote(result);
-    setLoading(false);
-  };
+const fetchQuote = async (cat: string) => {
+  setLoading(true);
+  // fetchQuote(cat + "?t=" + Date.now()) kabi emas, 
+  // shunchaki getSoulQuote(cat) ichidagi randomSeed muammoni hal qiladi.
+  const result = await getSoulQuote(cat);
+  setQuote(result);
+  setLoading(false);
+};
 
   useEffect(() => {
     fetchQuote('mehr');
