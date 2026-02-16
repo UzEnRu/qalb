@@ -1,63 +1,57 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { QuoteResponse, MiracleResponse } from "../types";
 
-// API kalitini olish
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+// API kalitini olish (Vite uchun)
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(API_KEY || "");
 
-export const getSoulQuote = async (category: string) => {
-  // Model nomini models/ prefiksisiz bering, kutubxona o'zi qo'shadi
-  const model = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
-    generationConfig: {
-      temperature: 1.0,
-      responseMimeType: "application/json",
+// getModel funksiyasini aniq belgilash (xatoni yo'qotish uchun)
+const getModelInstance = (isJson = true) => {
+  return genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash", // v1beta muammosi bo'lsa, kutubxona o'zi v1 ga o'tadi
+    generationConfig: { 
+      temperature: 1.0, 
+      topP: 0.95,
+      responseMimeType: isJson ? "application/json" : "text/plain",
     }
   });
-
-  const prompt = `Menga ${category} haqida yangi o'zbekcha hikmat yoz. JSON: {"text": "...", "author": "..."}`;
-
-  try {
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    return JSON.parse(text);
-  } catch (error: any) {
-    console.error("Batafsil xato:", error);
-    // Agar 404 bo'lsa, demak kalit yoki model nomi hali ham muammo
-    throw error;
-  }
 };
 
-// 2. Mo'jizaviy xabarlar uchun (MiracleModal qidirayotgan funksiya)
-export const getMiracleMessage = async (type: string): Promise<MiracleResponse> => {
-  const model = getModel(true);
+export const getSoulQuote = async (category: string): Promise<QuoteResponse> => {
+  const model = getModelInstance(true);
   const randomSeed = Math.random().toString(36).substring(7);
-
-  const prompt = `Menga "${type}" mavzusida bir mo'jizaviy, qalbni larzaga soladigan o'ta go'zal o'zbekcha xabar yozib ber. 
-  ID: ${randomSeed}. Uni ingliz tiliga ham tarjima qil. Javobni FAQAT JSON formatida ber: { "uzbek": "...", "english": "..." }`;
+  const prompt = `Menga ${category} haqida yangi o'zbekcha hikmat yoz. ID: ${randomSeed}. FAQAT JSON: { "text": "...", "author": "...", "category": "${category}" }`;
 
   try {
     const result = await model.generateContent(prompt);
     return JSON.parse(result.response.text());
   } catch (e) {
-    return {
-      uzbek: "Sening qalbing — koinotning eng go'zal mo'jizasidir.",
-      english: "Your heart is the most beautiful miracle of the universe."
-    };
+    console.error("SoulQuote Error:", e);
+    return { text: "Mehr bor joyda nur bor.", author: "Xalq hikmati", category: category as any };
   }
 };
 
-// 3. Ruhshunos maslahati uchun
-export const getPeaceAdvice = async (userFeeling: string): Promise<string> => {
-  const model = getModel(false);
+export const getMiracleMessage = async (type: string): Promise<MiracleResponse> => {
+  const model = getModelInstance(true);
   const randomSeed = Math.random().toString(36).substring(7);
+  const prompt = `Menga "${type}" haqida mo'jizaviy xabar yoz. ID: ${randomSeed}. FAQAT JSON: { "uzbek": "...", "english": "..." }`;
 
-  const prompt = `Foydalanuvchi o'zini shunday his qilmoqda: "${userFeeling}". 
-  Unga o'zbek tilida juda samimiy, do'stona va ruhiy taskin beruvchi 2-3 jumlali javob qaytar. 
-  ID: ${randomSeed}. Siz Asadbek Ashurov tomonidan yaratilgan virtual ma'naviy yo'lboshchisiz.`;
+  try {
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.text());
+  } catch (e) {
+    return { uzbek: "Siz mo'jizasiz.", english: "You are a miracle." };
+  }
+};
+
+export const getPeaceAdvice = async (userFeeling: string): Promise<string> => {
+  const model = getModelInstance(false); // Plain text uchun
+  const prompt = `Foydalanuvchi hissi: "${userFeeling}". Unga samimiy o'zbekcha tasalli yoz (2-3 jumla).`;
 
   try {
     const result = await model.generateContent(prompt);
     return result.response.text();
   } catch (e) {
-    return "Siz bilan hammasi yaxshi bo'ladi. Faqat nafas oling va tinchlikni his qiling.";
+    return "Hammasi yaxshi bo'ladi, nafas oling.";
   }
 };
