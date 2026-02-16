@@ -1,57 +1,69 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 import { QuoteResponse, MiracleResponse } from "../types";
 
-// API kalitini olish (Vite uchun)
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY || "");
-
-// getModel funksiyasini aniq belgilash (xatoni yo'qotish uchun)
-const getModelInstance = (isJson = true) => {
-  return genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash", // v1beta muammosi bo'lsa, kutubxona o'zi v1 ga o'tadi
-    generationConfig: { 
-      temperature: 1.0, 
-      topP: 0.95,
-      responseMimeType: isJson ? "application/json" : "text/plain",
-    }
-  });
-};
+// Groq API kalitini olish
+const groq = new Groq({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+  dangerouslyAllowBrowser: true // Frontendda ishlashi uchun shart
+});
 
 export const getSoulQuote = async (category: string): Promise<QuoteResponse> => {
-  const model = getModelInstance(true);
-  const randomSeed = Math.random().toString(36).substring(7);
-  const prompt = `Menga ${category} haqida yangi o'zbekcha hikmat yoz. ID: ${randomSeed}. FAQAT JSON: { "text": "...", "author": "...", "category": "${category}" }`;
+  const prompt = `Menga ${category} haqida o'ta go'zal o'zbekcha hikmatli so'z yozib ber. 
+  Javobni FAQAT ushbu JSON formatida qaytar: { "text": "...", "author": "...", "category": "${category}" }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.3-70b-versatile", // Eng kuchli va tezkor model
+      response_format: { type: "json_object" }, // JSON qaytarishini kafolatlaydi
+      temperature: 0.9,
+    });
+
+    const content = chatCompletion.choices[0]?.message?.content || "{}";
+    return JSON.parse(content);
   } catch (e) {
-    console.error("SoulQuote Error:", e);
-    return { text: "Mehr bor joyda nur bor.", author: "Xalq hikmati", category: category as any };
+    console.error("Groq Quote Error:", e);
+    return {
+      text: "Mehr bor joyda nur bor, zulmatga o'rin yo'q.",
+      author: "Xalq hikmati",
+      category: category as any
+    };
   }
 };
 
 export const getMiracleMessage = async (type: string): Promise<MiracleResponse> => {
-  const model = getModelInstance(true);
-  const randomSeed = Math.random().toString(36).substring(7);
-  const prompt = `Menga "${type}" haqida mo'jizaviy xabar yoz. ID: ${randomSeed}. FAQAT JSON: { "uzbek": "...", "english": "..." }`;
+  const prompt = `Menga "${type}" haqida mo'jizaviy o'zbekcha xabar yozib ber va inglizchaga tarjima qil. 
+  Javobni FAQAT JSON formatida ber: { "uzbek": "...", "english": "..." }`;
 
   try {
-    const result = await model.generateContent(prompt);
-    return JSON.parse(result.response.text());
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.3-70b-versatile",
+      response_format: { type: "json_object" },
+    });
+
+    const content = chatCompletion.choices[0]?.message?.content || "{}";
+    return JSON.parse(content);
   } catch (e) {
-    return { uzbek: "Siz mo'jizasiz.", english: "You are a miracle." };
+    return {
+      uzbek: "Siz hayotning eng go'zal mo'jizasisiz.",
+      english: "You are the most beautiful miracle of life."
+    };
   }
 };
 
 export const getPeaceAdvice = async (userFeeling: string): Promise<string> => {
-  const model = getModelInstance(false); // Plain text uchun
-  const prompt = `Foydalanuvchi hissi: "${userFeeling}". Unga samimiy o'zbekcha tasalli yoz (2-3 jumla).`;
+  const prompt = `Foydalanuvchi hissi: "${userFeeling}". Unga samimiy, do'stona o'zbekcha tasalli yoz (2-3 jumla).`;
 
   try {
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "llama-3.1-8b-instant", // Maslahat uchun juda tezkor model
+      temperature: 0.8,
+    });
+
+    return chatCompletion.choices[0]?.message?.content || "Hammasi yaxshi bo'ladi, nafas oling.";
   } catch (e) {
-    return "Hammasi yaxshi bo'ladi, nafas oling.";
+    return "Siz bilan hammasi yaxshi bo'ladi. Faqat nafas oling va tinchlikni his qiling.";
   }
 };
